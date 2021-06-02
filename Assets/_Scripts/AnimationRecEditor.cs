@@ -269,7 +269,8 @@ public class AnimationRecEditor : EditorWindow
     [MenuItem("AnimationRec/DeleteRec " + keyDeleteRec)]
     static void DeleteRec()
     {
-        string deletePath = savePath + animationName + ".anim";
+        string deletePath =  GetFullPath( animationName, savePath);
+
 
         if (AssetDatabase.LoadAssetAtPath(deletePath, typeof(AnimationClip)) != null)  // Check if animation file exists
         {
@@ -278,7 +279,8 @@ public class AnimationRecEditor : EditorWindow
         }
         else
         {
-            Debug.Log("File to be deleted not found");
+
+            Debug.Log(deletePath + " not found");
         }
     }
 
@@ -303,6 +305,16 @@ public class AnimationRecEditor : EditorWindow
         return obj.name +"_Animation";
     }
 
+
+    static string GetFullPath(string _name, string _savePath)
+    {
+        //fix path name
+        if (_savePath[_savePath.Length - 1] != '/')
+            _savePath += "/";
+
+        return _savePath + _name + ".anim";
+    }
+
     /// <summary>
     /// Return a valid name, not existing already
     /// </summary>
@@ -313,19 +325,18 @@ public class AnimationRecEditor : EditorWindow
     {
         int attempts = 0;
         string resultName = _name;
+        string fullPath = GetFullPath (resultName, _savePath);
 
-        //fix path name
-        if (_savePath[_savePath.Length - 1] != '/')
-            _savePath += "/";
 
         // Add an incremental number on the end of name until there is no file with same name 
-        while (AssetDatabase.LoadAssetAtPath(_savePath + resultName + ".anim", typeof(AnimationClip)) == null)
+        while (AssetDatabase.LoadAssetAtPath(fullPath, typeof(AnimationClip)) == null)
         {
             attempts++;
             resultName = _name + attempts;
+            fullPath = GetFullPath(resultName, _savePath);
         }
 
-        return _savePath + resultName + ".anim";
+        return fullPath;
     }
 
     /// <summary>
@@ -338,21 +349,18 @@ public class AnimationRecEditor : EditorWindow
     {
         int attempts = 0;
         string resultName = _name;
-
-        //fix path name if it doesn't end in "/"
-        if (_savePath[_savePath.Length - 1] != '/')
-            _savePath += "/";
+        string fullPath = GetFullPath(resultName, _savePath);
 
         // Add an incremental number on the end of name until there is no file with same name 
-        while (AssetDatabase.LoadAssetAtPath(_savePath + resultName + ".anim", typeof(AnimationClip)) != null)
+        while (AssetDatabase.LoadAssetAtPath(fullPath, typeof(AnimationClip)) != null)
         {
             attempts++;
             resultName = _name + " " +  attempts;
 
-            //Debug.Log(_savePath + resultName + ".anim");
+            fullPath = GetFullPath(resultName, _savePath);
         }
 
-        return _savePath + resultName + ".anim";
+        return fullPath;
     }
 
     /// <summary>
